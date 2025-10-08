@@ -1,20 +1,19 @@
-// Step 1: Import required modules
 import express from "express";
 import cors from "cors";
 import { config } from "dotenv";
+import { notFoundHandler } from "./middleware/notFoundHandler.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
-// Step 2: Load environment variables
 config();
 
-// Step 3: Create Express application
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Step 4: Apply middleware
-app.use(cors()); // Enable Cross-Origin Resource Sharing
-app.use(express.json()); // Parse JSON request bodies
+// Middleware
+app.use(cors());
+app.use(express.json());
 
-// Step 5: Create a simple test route
+// Routes
 app.get("/api/health", (req, res) => {
   res.json({
     success: true,
@@ -23,8 +22,26 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Step 6: Start the server
+// Test error route
+app.get("/api/error-test", (req, res) => {
+  throw new Error("This is a test error!");
+});
+
+// 404 Handler - MUST be after all routes
+app.use(notFoundHandler);
+
+// Error Handler - MUST be last middleware
+app.use(errorHandler);
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📍 Health check: http://localhost:${PORT}/api/health`);
 });
+
+// # Test successful route
+// curl http://localhost:5000/api/health
+
+// # Test error route
+// curl http://localhost:5000/api/error-test
+
+// # Test 404 route
+// curl http://localhost:5000/api/nonexistent
