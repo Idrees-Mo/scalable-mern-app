@@ -1,10 +1,13 @@
 import express from "express";
 import cors from "cors";
 import { config } from "dotenv";
+import connectDB from "./config/database.js";
 import { notFoundHandler } from "./middleware/notFoundHandler.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
 config();
+// Connect to database
+connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -22,26 +25,12 @@ app.get("/api/health", (req, res) => {
   });
 });
 
-// Test error route
-app.get("/api/error-test", (req, res) => {
-  throw new Error("This is a test error!");
-});
-
-// 404 Handler - MUST be after all routes
+// 404 Handler
 app.use(notFoundHandler);
 
-// Error Handler - MUST be last middleware
+// Error Handler
 app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
-
-// # Test successful route
-// curl http://localhost:5000/api/health
-
-// # Test error route
-// curl http://localhost:5000/api/error-test
-
-// # Test 404 route
-// curl http://localhost:5000/api/nonexistent
