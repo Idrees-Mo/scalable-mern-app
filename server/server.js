@@ -39,6 +39,7 @@ app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
 
+// ======= Testing Instructions for Auth Routes =======
 // # Test registration
 // curl -X POST http://localhost:5000/api/auth/register \
 //   -H "Content-Type: application/json" \
@@ -52,3 +53,22 @@ app.listen(PORT, () => {
 // # Test protected route (replace YOUR_TOKEN with actual token)
 // curl http://localhost:5000/api/auth/me \
 //   -H "Authorization: Bearer YOUR_TOKEN"
+
+// ======= User Routes =======
+
+// # Get your token first (from login)
+// TOKEN="YOUR_JWT_TOKEN_HERE"
+
+// # Get all users (will be empty at first)
+// curl -H "Authorization: Bearer $TOKEN" http://localhost:5000/api/users
+
+// # Update your profile
+// curl -X PUT http://localhost:5000/api/users/profile \
+//   -H "Authorization: Bearer $TOKEN" \
+//   -H "Content-Type: application/json" \
+//   -d '{"username":"newname"}'
+
+// # Test validation
+// curl -X POST http://localhost:5000/api/auth/register \
+//   -H "Content-Type: application/json" \
+//   -d '{"username":"ab","email":"invalid-email","password":"123"}'
