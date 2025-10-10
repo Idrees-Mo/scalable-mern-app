@@ -28,8 +28,8 @@ export const AuthProvider = ({ children }) => {
       try {
         const response = await api.get("/auth/me");
         setUser(response.data.data);
-        // eslint-disable-next-line no-unused-vars
       } catch (error) {
+        console.error("Auth check failed:", error);
         localStorage.removeItem("token");
         localStorage.removeItem("user");
       }
@@ -86,6 +86,14 @@ export const AuthProvider = ({ children }) => {
     setError(null);
   };
 
+  // Update user function - this might be missing!
+  const updateUser = (userData) => {
+    setUser((prevUser) => ({ ...prevUser, ...userData }));
+    // Also update localStorage
+    const updatedUser = { ...user, ...userData };
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+  };
+
   const value = {
     user,
     loading,
@@ -94,6 +102,7 @@ export const AuthProvider = ({ children }) => {
     register,
     logout,
     setError,
+    setUser: updateUser, // Make sure this is included!
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
