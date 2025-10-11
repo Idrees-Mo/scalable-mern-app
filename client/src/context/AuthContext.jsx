@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from "react";
 import api from "../utils/api.js";
+import { useNotification } from "../context/NotificationContext.jsx";
 
 const AuthContext = createContext();
 
@@ -16,6 +17,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const notification = useNotification();
 
   // Check if user is logged in on app start
   useEffect(() => {
@@ -48,10 +50,12 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("user", JSON.stringify(user));
       setUser(user);
 
+      notification.success("Login successful!");
       return { success: true };
     } catch (error) {
       const message = error.response?.data?.message || "Login failed";
       setError(message);
+      notification.error(message);
       return { success: false, message };
     }
   };
@@ -71,10 +75,12 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem("user", JSON.stringify(user));
       setUser(user);
 
+      notification.success("Registration successful!");
       return { success: true };
     } catch (error) {
       const message = error.response?.data?.message || "Registration failed";
       setError(message);
+      notification.error(message);
       return { success: false, message };
     }
   };
@@ -84,6 +90,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem("user");
     setUser(null);
     setError(null);
+    notification.info("You have been logged out.");
   };
 
   // Update user function - this might be missing!
