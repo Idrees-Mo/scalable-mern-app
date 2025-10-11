@@ -1,5 +1,6 @@
 .dashboard {
   min-height: 100vh;
+  min-width: 100vw;
   background-color: #f8f9fa;
 }
 

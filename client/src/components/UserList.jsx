@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import api from "../utils/api.js";
+import { useNotification } from "../context/NotificationContext.jsx";
 
 const UserList = () => {
   const [users, setUsers] = useState([]);
@@ -9,6 +10,7 @@ const UserList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(null);
+  const { success, error: notifyError } = useNotification();
 
   // Memoized fetch function
   const fetchUsers = useCallback(async (page = 1, limit = 10, filters = {}) => {
@@ -53,18 +55,18 @@ const UserList = () => {
     try {
       await api.delete(`/users/${userId}`);
 
-      // Update local state by removing the deleted user
       setUsers((prev) => prev.filter((user) => user._id !== userId));
 
-      // If we deleted the last item on the page and it's not page 1, go to previous page
       if (users.length === 1 && currentPage > 1) {
         setCurrentPage(currentPage - 1);
       } else {
-        // Refresh the current page data
         fetchUsers(currentPage, 10, { search: searchTerm });
       }
+
+      success("User deleted successfully!");
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to delete user");
+      const message = err.response?.data?.message || "Failed to delete user";
+      notifyError(message);
     } finally {
       setDeleteLoading(null);
     }

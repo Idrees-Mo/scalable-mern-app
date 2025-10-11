@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useUsers } from "../hooks/useUsers.js";
+import { useNotification } from "../context/NotificationContext.jsx";
 
 const ProfileEditor = () => {
   const { user, setUser } = useAuth();
   const { updateProfile } = useUsers();
+  const { success, error: notifyError } = useNotification();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     username: user?.username || "",
@@ -23,26 +25,21 @@ const ProfileEditor = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setMessage("");
 
     try {
       const updatedUser = await updateProfile(formData);
 
-      // Update the auth context with the new user data
-      // This is the key fix - we need to call setUser from useAuth
-      if (setUser) {
-        setUser(updatedUser);
-      }
+      setUser(updatedUser);
 
-      // Also update localStorage to keep data consistent
+      // Update localStorage
       const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
       const updatedUserData = { ...currentUser, ...updatedUser };
       localStorage.setItem("user", JSON.stringify(updatedUserData));
 
-      setMessage("Profile updated successfully!");
+      success("Profile updated successfully!");
       setIsEditing(false);
     } catch (err) {
-      setMessage(err.message || "Failed to update profile");
+      notifyError(err.message || "Failed to update profile");
     } finally {
       setLoading(false);
     }
