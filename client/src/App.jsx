@@ -6,6 +6,8 @@ import {
   Navigate,
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
+import { NotificationProvider } from "./context/NotificationContext.jsx";
+import Notification from "./components/Notification.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import RegisterPage from "./pages/RegisterPage.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
@@ -22,7 +24,7 @@ const ProtectedRoute = ({ children }) => {
   return user ? children : <Navigate to="/login" />;
 };
 
-// Public Route component (redirect to dashboard if logged in)
+// Public Route component
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
 
@@ -36,6 +38,7 @@ const PublicRoute = ({ children }) => {
 function AppContent() {
   return (
     <div className="app">
+      <Notification />
       <Routes>
         <Route path="/" element={<Navigate to="/dashboard" />} />
 
@@ -75,9 +78,11 @@ function AppContent() {
 function App() {
   return (
     <Router>
-      <AuthProvider>
-        <AppContent />
-      </AuthProvider>
+      <NotificationProvider>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </NotificationProvider>
     </Router>
   );
 }
